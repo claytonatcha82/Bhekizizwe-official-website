@@ -1,3 +1,4 @@
+import emailjs from "@emailjs/browser";
 import React from 'react';
 import { PageHero } from '@/components/sections/PageHero';
 import { motion } from 'framer-motion';
@@ -33,15 +34,40 @@ export function ContactPage() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast({
-      title: 'Message Sent',
-      description: 'Thank you for contacting Bhekizizwe Projects & Civils. Our team will get back to you shortly.',
-    });
-    form.reset();
-  };
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  try {
+    await emailjs.send(
+      "service_n58vw5m",
+      "template_crw7zpy",
+      {
+        from_name: values.fullName,
+        company: values.companyName,
+        from_email: values.email,
+        phone: values.phone,
+        service: values.service,
+        message: values.message,
+      },
+      "fzr_TVgt_WYPT1USR"
+    );
 
+    toast({
+      title: "Message Sent",
+      description:
+        "Thank you for contacting Bhekizizwe Projects & Civils. Our team will get back to you shortly.",
+    });
+
+    form.reset();
+  } catch (error) {
+    console.error("EmailJS Error:", error);
+
+    toast({
+      title: "Message Failed",
+      description:
+        "Sorry, something went wrong. Please try again later.",
+      variant: "destructive",
+    });
+  }
+};
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
